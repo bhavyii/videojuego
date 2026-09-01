@@ -16,6 +16,8 @@ public class PlantGrowth : MonoBehaviour
     public float growDuration = 3f;
 
     private XRSocketInteractor socket;
+    private bool hasSeed = false;
+    private bool isWatered = false;
 
     private void Awake()
     {
@@ -34,18 +36,22 @@ public class PlantGrowth : MonoBehaviour
 
     private void OnPlantSeeded(SelectEnterEventArgs args)
     {
-        // Validar si el objeto colocado tiene el Tag Seed
-        if (args.interactableObject.transform.CompareTag("Seed"))
+        if (args.interactableObject.transform.CompareTag("Seed") && !hasSeed)
         {
             GameObject seedObj = args.interactableObject.transform.gameObject;
-
-            // Destruir la semilla consumida
             Destroy(seedObj);
 
-            // Desactivar el socket para que no reciba otra semilla mientras crece
+            hasSeed = true;
             socket.enabled = false;
+        }
+    }
 
-            // Brotar la planta
+    // Detecta el choque de las particulas de agua contra el collider de la tierra
+    private void OnParticleCollision(GameObject other)
+    {
+        if (hasSeed && !isWatered)
+        {
+            isWatered = true;
             StartCoroutine(GrowRoutine());
         }
     }

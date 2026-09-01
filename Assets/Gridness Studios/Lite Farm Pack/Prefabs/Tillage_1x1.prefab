@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: -8148696353848839379}
   - component: {fileID: 7677316790781791644}
   - component: {fileID: 985854794546850682}
+  - component: {fileID: 7816417413456810991}
   m_Layer: 0
   m_Name: Tillage_1x1
   m_TagString: Untagged
@@ -210,3 +211,24 @@ MonoBehaviour:
   plantPrefab: {fileID: 5054277889059016994, guid: f12845bb4d1709a499e97026b8068627, type: 3}
   spawnPoint: {fileID: 5089436693391441770}
   growDuration: 3
+--- !u!65 &7816417413456810991
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8189335142238257542}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.253104, z: 1}
+  m_Center: {x: 0.000000029802322, y: 0.11685528, z: 0.0010414124}
