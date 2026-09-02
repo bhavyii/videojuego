@@ -1,11 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using System.Collections.Generic;
-using System.Linq;
 
 public class PlantGrowth : MonoBehaviour
 {
@@ -18,6 +18,16 @@ public class PlantGrowth : MonoBehaviour
 
     [Tooltip("Tiempo en segundos que tarda la animación (respaldo)")]
     public float growDuration = 3f;
+
+    [Header("Audio 3D")]
+    [Tooltip("AudioSource para los efectos de la tierra")]
+    public AudioSource plantAudioSource;
+
+    [Tooltip("Sonido al sembrar la semilla")]
+    public AudioClip seedPlantedClip;
+
+    [Tooltip("Sonido al finalizar el crecimiento")]
+    public AudioClip plantGrownClip;
 
     private XRSocketInteractor socket;
     private bool hasSeed = false;
@@ -32,6 +42,9 @@ public class PlantGrowth : MonoBehaviour
     private void Awake()
     {
         socket = GetComponent<XRSocketInteractor>();
+
+        if (plantAudioSource == null)
+            plantAudioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -55,6 +68,10 @@ public class PlantGrowth : MonoBehaviour
             plantedCrop = item != null ? item.crop : null;
 
             Debug.Log($"[PlantGrowth] '{name}': sembrado '{(plantedCrop != null ? plantedCrop.cropName : "SIN CULTIVO (respaldo)")}'. Ahora riega aqui.", this);
+
+            // Audio al plantar la semilla
+            if (plantAudioSource != null && seedPlantedClip != null)
+                plantAudioSource.PlayOneShot(seedPlantedClip);
 
             Destroy(seedObj);
 
@@ -110,8 +127,6 @@ public class PlantGrowth : MonoBehaviour
 
         GameObject plant = Instantiate(prefabToGrow, spawnPos, spawnRot);
 
-        // Al arrancar la planta, la parcela vuelve a quedar libre para sembrar.
-        // Sin esto la parcela se usa una sola vez en toda la partida.
         HarvestableCrop cosechable = plant.GetComponent<HarvestableCrop>();
         if (cosechable != null)
             cosechable.Cosechado += LiberarParcela;
@@ -120,6 +135,15 @@ public class PlantGrowth : MonoBehaviour
 
         Vector3 finalScale = plant.transform.localScale;
         plant.transform.localScale = Vector3.zero;
+
+        // INICIO DE CRECIMIENTO: ajustar tono/velocidad del clip a la duración exacta
+        if (plantAudioSource != null && plantGrownClip != null)
+        {
+            plantAudioSource.clip = plantGrownClip;
+            // Adapta la velocidad de reproducción para que dure exactamente lo que dura la animación
+            plantAudioSource.pitch = plantGrownClip.length / duration;
+            plantAudioSource.Play();
+        }
 
         float elapsed = 0f;
         while (elapsed < duration)
@@ -131,13 +155,16 @@ public class PlantGrowth : MonoBehaviour
 
         plant.transform.localScale = finalScale;
 
-        // Los frutos nacen HASTA AQUI, ya terminada la animacion, y como objetos
-        // independientes. Si fueran hijos con Rigidbody, la fisica los dejaria
-        // atras mientras la planta escala y terminarian amontonados en la raiz.
+        // FIN DE CRECIMIENTO: apagar el sonido y restaurar el pitch
+        if (plantAudioSource != null && plantAudioSource.isPlaying)
+        {
+            plantAudioSource.Stop();
+            plantAudioSource.pitch = 1f;
+        }
+
         if (plantedCrop != null && plantedCrop.fruitsPerPlant > 0 && plantedCrop.fruitPrefab != null)
             ColgarFrutos(plant, plantedCrop);
     }
-
     /// <summary>
     /// Reparte los frutos en circulo alrededor de la planta ya crecida.
     /// Quedan sueltos en el mundo: cortar uno no afecta a los demas ni al tallo.
@@ -212,7 +239,6 @@ public class PlantGrowth : MonoBehaviour
         Bounds b = CalcularBounds(planta);
         float radio = Mathf.Max(b.size.x, b.size.z) * 0.30f;
         float angulo = (360f / Mathf.Max(cultivo.fruitsPerPlant, 1)) * indice * Mathf.Deg2Rad;
-
 
         return new Vector3(
             b.center.x + Mathf.Cos(angulo) * radio,
