@@ -81,14 +81,21 @@ public class PlantGrowth : MonoBehaviour
     }
 
     // Detecta el choque de las particulas de agua contra el collider de la tierra
+    // Detecta el choque directo de partículas (si el collider está en este mismo objeto)
     private void OnParticleCollision(GameObject other)
     {
-        // Ojo: esto se dispara en cada fotograma mientras cae el agua.
-        // Nada de logs aqui salvo dentro del if, que corre una sola vez.
+        Regar(other.name);
+    }
+
+    /// <summary>
+    /// Método público para iniciar el crecimiento al recibir agua (desde este script o desde un relay en el padre).
+    /// </summary>
+    public void Regar(string origen = "Agua")
+    {
         if (hasSeed && !isWatered)
         {
             isWatered = true;
-            Debug.Log($"[PlantGrowth] '{name}': regada con '{other.name}'.", this);
+            Debug.Log($"[PlantGrowth] '{name}': regada con '{origen}'.", this);
             StartCoroutine(GrowRoutine());
         }
     }
