@@ -155,7 +155,9 @@ public class PlantGrowth : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            plant.transform.localScale = Vector3.Lerp(Vector3.zero, finalScale, elapsed / duration);
+            float t = elapsed / duration;
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            plant.transform.localScale = Vector3.Lerp(Vector3.zero, finalScale, smoothT);
             elapsed += Time.deltaTime;
             yield return null;
         }

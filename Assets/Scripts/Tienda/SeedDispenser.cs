@@ -106,6 +106,9 @@ public class SeedDispenser : MonoBehaviour
         if (args.interactableObject is not XRGrabInteractable grab)
             return;
 
+        // Feedback háptico en la mano que toma la semilla
+        VRHapticHelper.TriggerHaptic(args.interactorObject, 0.45f, 0.1f);
+
         // Se cobra una sola vez: la semilla deja de pertenecer al estante
         grab.selectEntered.RemoveListener(OnSeedTaken);
 

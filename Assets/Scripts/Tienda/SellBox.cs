@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -10,11 +11,24 @@ public class SellBox : MonoBehaviour
     [Tooltip("Si esta activo, solo paga por plantas ya arrancadas, no por las sembradas")]
     public bool exigirCosechada = true;
 
-    [Tooltip("Segundos que la verdura sigue visible tras venderla, para que el jugador la vea")]
-    [Min(0f)] public float segundosParaDesaparecer = 5f;
+    [Tooltip("Segundos que la verdura sigue visible tras venderla antes de desaparecer")]
+    [Min(0f)] public float segundosParaDesaparecer = 1.5f;
 
     [Tooltip("Deja rastro en consola de todo lo que entra a la zona. Apagalo cuando ya funcione")]
-    public bool diagnostico = true;
+    public bool diagnostico = false;
+
+    [Header("Audio y Feedback")]
+    public AudioSource sellAudioSource;
+    public AudioClip sellClip;
+
+    /// <summary>Se dispara cuando una verdura se vende con éxito en la caja.</summary>
+    public static event System.Action<CropData> OnCropSold;
+
+    private void Awake()
+    {
+        if (sellAudioSource == null)
+            sellAudioSource = GetComponent<AudioSource>();
+    }
 
     private void Reset()
     {
@@ -45,9 +59,6 @@ public class SellBox : MonoBehaviour
         if (cultivo.esTallo)
             return; // los tallos no se compran
 
-        // Imprescindible: OnTriggerStay corre cada cuadro, y sin esta bandera
-        // la misma verdura se pagaria una y otra vez durante los 5 segundos
-        // que tarda en desaparecer.
         if (cultivo.Vendida)
             return;
 
@@ -73,11 +84,55 @@ public class SellBox : MonoBehaviour
         int pago = cultivo.crop.harvestValue;
         PlayerWallet.Instance.Add(pago);
         cultivo.MarcarVendida();
+        OnCropSold?.Invoke(cultivo.crop);
+
+        // Audio al vender
+        if (sellAudioSource != null && sellClip != null)
+        {
+            sellAudioSource.pitch = Random.Range(0.95f, 1.05f);
+            sellAudioSource.PlayOneShot(sellClip);
+        }
+
+        // Feedback háptico al jugador
+        var players = Object.FindObjectsByType<UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics.HapticImpulsePlayer>(FindObjectsInactive.Exclude);
+        foreach (var p in players)
+        {
+            if (Vector3.Distance(p.transform.position, transform.position) < 4f)
+            {
+                p.SendHapticImpulse(0.5f, 0.1f);
+            }
+        }
 
         Debug.Log($"[Venta] '{cultivo.crop.cropName}' vendida en ${pago}. Saldo: ${PlayerWallet.Instance.Money}.", this);
 
-        // El pago es inmediato; la verdura se queda un rato para poder verla
-        Destroy(cultivo.gameObject, segundosParaDesaparecer);
+        // Desaparición suave encogiéndose gradualmente
+        StartCoroutine(DesvanecerVendido(cultivo.gameObject, segundosParaDesaparecer));
+    }
+
+    private IEnumerator DesvanecerVendido(GameObject obj, float delay)
+    {
+        if (obj == null) yield break;
+
+        yield return new WaitForSeconds(delay);
+
+        if (obj == null) yield break;
+
+        Vector3 initialScale = obj.transform.localScale;
+        float shrinkDuration = 0.4f;
+        float elapsed = 0f;
+
+        while (elapsed < shrinkDuration && obj != null)
+        {
+            float t = elapsed / shrinkDuration;
+            obj.transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, Mathf.SmoothStep(0f, 1f, t));
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (obj != null)
+        {
+            Destroy(obj);
+        }
     }
 
     // Dibuja la zona de cobro para poder colocarla sin adivinar

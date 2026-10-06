@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Anchor
   - Seed
+  - Mouth
   layers:
   - Default
   - TransparentFX

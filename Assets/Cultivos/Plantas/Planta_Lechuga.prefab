@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6764685532925480795}
   - component: {fileID: 2820162917347891586}
   - component: {fileID: 1988288391100698751}
+  - component: {fileID: -2505477505396377526}
   m_Layer: 0
   m_Name: Planta_Lechuga
   m_TagString: Untagged
@@ -81,9 +82,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &2820162917347891586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,32 +162,32 @@ MonoBehaviour:
   m_ParentInteractableObject: {fileID: 0}
   m_AttachTransform: {fileID: 0}
   m_SecondaryAttachTransform: {fileID: 0}
-  m_UseDynamicAttach: 0
+  m_UseDynamicAttach: 1
   m_MatchAttachPosition: 1
   m_MatchAttachRotation: 1
   m_SnapToColliderVolume: 1
   m_ReinitializeDynamicAttachEverySingleGrab: 1
-  m_AttachEaseInTime: 0.15
-  m_MovementType: 2
+  m_AttachEaseInTime: 0.12
+  m_MovementType: 1
   m_PredictedVisualsTransform: {fileID: 0}
   m_VelocityDamping: 1
   m_VelocityScale: 1
   m_AngularVelocityDamping: 1
   m_AngularVelocityScale: 1
   m_TrackPosition: 1
-  m_SmoothPosition: 0
-  m_SmoothPositionAmount: 8
+  m_SmoothPosition: 1
+  m_SmoothPositionAmount: 12
   m_TightenPosition: 0.1
   m_TrackRotation: 1
-  m_SmoothRotation: 0
-  m_SmoothRotationAmount: 8
+  m_SmoothRotation: 1
+  m_SmoothRotationAmount: 12
   m_TightenRotation: 0.1
   m_TrackScale: 1
   m_SmoothScale: 0
   m_SmoothScaleAmount: 8
   m_TightenScale: 0.1
   m_ThrowOnDetach: 1
-  m_ThrowSmoothingDuration: 0.25
+  m_ThrowSmoothingDuration: 0.15
   m_ThrowSmoothingCurve:
     serializedVersion: 2
     m_Curve:
@@ -230,6 +231,20 @@ MonoBehaviour:
   crop: {fileID: 11400000, guid: de92bbcc0182e6e488700dc7aca1a214, type: 2}
   esTallo: 0
   segundosParaMarchitarse: 5
+--- !u!114 &-2505477505396377526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4167024930174709471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675f97c6ebb4b0244bf27b44211c1537, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EdibleFood
+  eatClip: {fileID: 8300000, guid: eae9f534b0ddde44385570489aaae6a6, type: 3}
+  eatParticlesPrefab: {fileID: 0}
 --- !u!1001 &7647021260619365028
 PrefabInstance:
   m_ObjectHideFlags: 0

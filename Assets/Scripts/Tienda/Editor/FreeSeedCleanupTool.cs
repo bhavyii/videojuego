@@ -54,7 +54,7 @@ public static class FreeSeedCleanupTool
 
     private static List<GameObject> Buscar()
     {
-        return Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+        return Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include)
             .Where(go => go.CompareTag("Seed"))
             .Where(go => go.GetComponentInParent<SeedDispenser>() == null)
             .Where(go => go.transform.root.name != "TiendaSemillas")

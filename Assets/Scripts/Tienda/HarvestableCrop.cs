@@ -75,6 +75,9 @@ public class HarvestableCrop : MonoBehaviour
         Cosechada = true;
         cuerpo.constraints = RigidbodyConstraints.None;
 
+        // Feedback háptico al arrancar la verdura de la tierra
+        VRHapticHelper.TriggerHaptic(args.interactorObject, 0.6f, 0.15f);
+
         // El tallo no sirve de nada una vez arrancado; se marchita solo
         // para no dejar tallos tirados por toda la granja.
         if (esTallo && segundosParaMarchitarse > 0f)
